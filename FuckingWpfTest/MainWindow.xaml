@@ -1,0 +1,55 @@
+﻿<Window x:Class="FuckingWpfTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FuckingWpfTest"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <!--#region ListView-->
+        <ListView ItemsSource="{Binding Employes, Mode=OneWay}">
+            <!-- DataContext is helpt to visualize the Content In the Designer. -->
+            <ListView.DataContext>
+                <local:EmployeViewModel/>
+            </ListView.DataContext>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <!--#region Custom DataTrigger For The ContextMenu-->
+                    <ContextMenu.Style>
+                        <!-- ok so We need the BasedOn property Because we use a global style (a style that didn't have a x:key value)-->
+                        <Style TargetType="{x:Type ContextMenu}" BasedOn="{StaticResource {x:Type ContextMenu}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource Self}, Converter={x:Static local:IsNullConverter.Instance}}" Value="False">
+                                    <Setter Property="IsOpen" Value="False"/>
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContextMenu.Style>
+                    <!--#endregion-->
+                    <!--#region MenuItems -->
+                    <MenuItem Header="Remove Selected Employes" 
+                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu},
+                                                        Path=PlacementTarget.SelectedItems}" 
+                              
+                              Command="{Binding DataContext.DeletEmployesCommand,
+                                            RelativeSource={RelativeSource Mode=FindAncestor,
+                                            AncestorType={x:Type ItemsControl}}}"/>
+                    <!--#endregion-->
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.ItemTemplate>
+                <!--#region DataTemplate-->
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock FontSize="30" Text="{Binding Name}" />
+                        <TextBlock Margin="15 0" FontSize="30" Text="{Binding Age}" />
+                    </StackPanel>
+                </DataTemplate>
+                <!--#endregion-->
+            </ListView.ItemTemplate>
+        </ListView>
+        <!--#endregion-->
+    </Grid>
+</Window>
